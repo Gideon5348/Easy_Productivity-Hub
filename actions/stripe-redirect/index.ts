@@ -1,16 +1,11 @@
 "use server";
 
 import { auth, currentUser } from "@clerk/nextjs";
-import { revalidatePath } from "next/cache";
-import { ACTION, ENTITY_TYPE } from "@prisma/client";
-
-import { db } from "@/lib/db";
-import { createAuditLog } from "@/lib/create-audit-log";
-import { createSafeAction } from "@/lib/create-safe-action";
-
-import { StripeRedirect } from "./schema";
 import { InputType, ReturnType } from "./types";
-
+import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
+import { createSafeAction } from "@/lib/create-safe-action";
+import { StripeRedirect } from "./schema";
 import { absoluteUrl } from "@/lib/utils";
 import { stripe } from "@/lib/stripe";
 
@@ -20,7 +15,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   if (!userId || !orgId || !user) {
     return {
-      error: "Unauthorized",
+      error: "Unauthorized!",
     };
   }
 
@@ -32,7 +27,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     const orgSubscription = await db.orgSubscription.findUnique({
       where: {
         orgId,
-      }
+      },
     });
 
     if (orgSubscription && orgSubscription.stripeCustomerId) {
@@ -55,12 +50,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
             price_data: {
               currency: "USD",
               product_data: {
-                name: "Taskify Pro",
-                description: "Unlimited boards for your organization"
+                name: "Easy Productivity Hub Pro",
+                description: "Unlimited Boards for your organization.",
               },
               unit_amount: 2000,
               recurring: {
-                interval: "month"
+                interval: "month",
               },
             },
             quantity: 1,
@@ -73,11 +68,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
       url = stripeSession.url || "";
     }
-  } catch {
-    return {
-      error: "Something went wrong!"
-    }
-  };
+  } catch (error) {
+    return { error: "Something went wrong!" };
+  }
 
   revalidatePath(`/organization/${orgId}`);
   return { data: url };

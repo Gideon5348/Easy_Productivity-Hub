@@ -1,15 +1,14 @@
-import Link from "next/link";
-import { auth } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
-import { HelpCircle, User2 } from "lucide-react";
-
-import { db } from "@/lib/db";
+import { FormPopover } from "@/components/form/form-popover";
 import { Hint } from "@/components/hint";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FormPopover } from "@/components/form/form-popover";
 import { MAX_FREE_BOARDS } from "@/constants/boards";
+import { db } from "@/lib/db";
 import { getAvailableCount } from "@/lib/org-limit";
 import { checkSubscription } from "@/lib/subscription";
+import { auth } from "@clerk/nextjs";
+import { HelpCircle, User2 } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const BoardList = async () => {
   const { orgId } = auth();
@@ -23,8 +22,8 @@ export const BoardList = async () => {
       orgId,
     },
     orderBy: {
-      createdAt: "desc"
-    }
+      createdAt: "desc",
+    },
   });
 
   const availableCount = await getAvailableCount();
@@ -32,42 +31,40 @@ export const BoardList = async () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center font-semibold text-lg text-neutral-700">
+      <div className="flex items-center font-semibold text-lg text-white">
         <User2 className="h-6 w-6 mr-2" />
-        Your boards
+        Your Boards
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {boards.map((board) => (
           <Link
             key={board.id}
             href={`/board/${board.id}`}
-            className="group relative aspect-video bg-no-repeat bg-center bg-cover bg-sky-700 rounded-sm h-full w-full p-2 overflow-hidden"
             style={{ backgroundImage: `url(${board.imageThumbUrl})` }}
+            className="group border-[1px] border-sky-200 relative aspect-video shrink-0 bg-no-repeat bg-center bg-cover bg-sky-700 rounded-sm h-full w-full p-2 overflow-hidden hover:scale-110 transition"
           >
             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition" />
-            <p className="relative font-semibold text-white">
-              {board.title}
-            </p>
+            <p className="relative font-semibold text-muted">{board.title}</p>
           </Link>
         ))}
         <FormPopover sideOffset={10} side="right">
           <div
             role="button"
-            className="aspect-video relative h-full w-full bg-muted rounded-sm flex flex-col gap-y-1 items-center justify-center hover:opacity-75 transition"
+            className="aspect-video shrink-0 relative h-full w-full bg-muted rounded-sm flex flex-col gap-y-1 items-center justify-center hover:opacity-90 hover:scale-110 transition"
           >
-            <p className="text-sm">Create new board</p>
+            <p className="text-sm">Create New Board</p>
             <span className="text-xs">
-              {isPro ? "Unlimited" : `${MAX_FREE_BOARDS - availableCount} remaining`}
+              {isPro
+                ? "Unlimited"
+                : `${MAX_FREE_BOARDS - availableCount} remaining`}
             </span>
             <Hint
               sideOffset={40}
               description={`
-                Free Workspaces can have up to 5 open boards. For unlimited boards upgrade this workspace.
-              `}
+          Free workspaces can have upto 5 Boards only. Upgrade to Pro for more Boards.
+          `}
             >
-              <HelpCircle
-                className="absolute bottom-2 right-2 h-[14px] w-[14px]"
-              />
+              <HelpCircle className="absolute bottom-2 right-2 h-[14px] w-[14px]" />
             </Hint>
           </div>
         </FormPopover>
@@ -76,16 +73,9 @@ export const BoardList = async () => {
   );
 };
 
-BoardList.Skeleton = function SkeletonBoardList() {
+BoardList.Skeleton = function BoardListSkeleton() {
   return (
-    <div className="grid gird-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-      <Skeleton className="aspect-video h-full w-full p-2" />
-      <Skeleton className="aspect-video h-full w-full p-2" />
-      <Skeleton className="aspect-video h-full w-full p-2" />
-      <Skeleton className="aspect-video h-full w-full p-2" />
-      <Skeleton className="aspect-video h-full w-full p-2" />
-      <Skeleton className="aspect-video h-full w-full p-2" />
-      <Skeleton className="aspect-video h-full w-full p-2" />
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 ">
       <Skeleton className="aspect-video h-full w-full p-2" />
     </div>
   );

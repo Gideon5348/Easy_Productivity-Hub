@@ -1,19 +1,14 @@
 "use server";
 
 import { auth } from "@clerk/nextjs";
-import { revalidatePath } from "next/cache";
-
-import { db } from "@/lib/db";
-import { createSafeAction } from "@/lib/create-safe-action";
-
 import { InputType, ReturnType } from "./types";
+import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
+import { createSafeAction } from "@/lib/create-safe-action";
 import { CreateBoard } from "./schema";
-import { createAuditLog } from "@/lib/create-audit-log";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
-import { 
-  incrementAvailableCount, 
-  hasAvailableCount
-} from "@/lib/org-limit";
+import { createAuditLog } from "@/lib/create-audit-log";
+import { hasAvailableCount, incrementAvailableCount } from "@/lib/org-limit";
 import { checkSubscription } from "@/lib/subscription";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
@@ -21,7 +16,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   if (!userId || !orgId) {
     return {
-      error: "Unauthorized",
+      error: "Unauthorized!",
     };
   }
 
@@ -30,23 +25,25 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   if (!canCreate && !isPro) {
     return {
-      error: "You have reached your limit of free boards. Please upgrade to create more."
-    }
+      error:
+        "You have reached to the limit of Free Boards. Please! Upgrade to create more Boards.",
+    };
   }
 
   const { title, image } = data;
 
-  const [
-    imageId,
-    imageThumbUrl,
-    imageFullUrl,
-    imageLinkHTML,
-    imageUserName
-  ] = image.split("|");
+  const [imageId, imageThumbUrl, imageFullUrl, imageLinkHtml, imageUserName] =
+    image.split("|");
 
-  if (!imageId || !imageThumbUrl || !imageFullUrl || !imageUserName || !imageLinkHTML) {
+  if (
+    !imageId ||
+    !imageThumbUrl ||
+    !imageFullUrl ||
+    !imageLinkHtml ||
+    !imageUserName
+  ) {
     return {
-      error: "Missing fields. Failed to create board."
+      error: "Missing fields, Failed to create Board!",
     };
   }
 
@@ -60,13 +57,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         imageId,
         imageThumbUrl,
         imageFullUrl,
-        imageUserName,
-        imageLinkHTML,
-      }
+        imageLinkHtml,
+      },
     });
 
     if (!isPro) {
-     await incrementAvailableCount();
+      await incrementAvailableCount();
     }
 
     await createAuditLog({
@@ -74,11 +70,11 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       entityId: board.id,
       entityType: ENTITY_TYPE.BOARD,
       action: ACTION.CREATE,
-    })
+    });
   } catch (error) {
     return {
-      error: "Failed to create."
-    }
+      error: "Failed to create board.",
+    };
   }
 
   revalidatePath(`/board/${board.id}`);
