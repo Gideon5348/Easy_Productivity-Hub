@@ -71,7 +71,7 @@ STRIPE_WEBHOOK_SECRET=
 
 ### Setup Prisma
 
-Add MySQL Database (I used PlanetScale)
+Add PostgreSQL Database (I used Supabase | The Open Source Firebase Alternative)
 
 ```shell
 npx prisma generate
