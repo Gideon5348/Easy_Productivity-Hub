@@ -38,8 +38,7 @@ Secure Payments: Seamlessly handle payments and subscriptions using Stripe integ
 ### Cloning the repository
 
 ```shell
-git clone https://github.com/AntonioErdeljac/next13-trello.git
-```
+git clone https://github.com/Gideon5348/Easy_Productivity-Hub.git
 
 ### Install packages
 
